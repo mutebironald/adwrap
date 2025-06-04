@@ -1,0 +1,19 @@
+{
+  "dev": {
+    "driver": "pg",
+    "host": "localhost",
+    "database": "adwrap",
+    "user": "postgres",
+    "password": "postgres",
+    "port": 5432
+  },
+
+  "docker": {
+    "driver":"pg",
+    "host":"db",
+    "database":"adwrap",
+    "user":"postgres",
+    "password":"postgres",
+    "port":5432
+  }
+}
