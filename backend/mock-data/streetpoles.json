@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1,
+    "type": "streetpole",
+    "workspace": 2,
+    "location": "Aminu Kano Crescent, Abuja",
+    "closestLandmark": "Wuse Market",
+    "numberOfStreetPoles": 3,
+    "sideRoute": ["North", "South"],
+    "availability": "Available",
+    "routes": [
+      {
+        "id": 201,
+        "sideRoute": "North",
+        "description": "Towards Berger Junction",
+        "numberOfStreetPoles": 2,
+        "pricePerStreetPole": 25000,
+        "images": ["https://example.com/streetpole-1a.jpg"],
+        "mediaItem": 1
+      },
+      {
+        "id": 202,
+        "sideRoute": "South",
+        "description": "Back toward Banex Plaza",
+        "numberOfStreetPoles": 1,
+        "pricePerStreetPole": 20000,
+        "images": ["https://example.com/streetpole-1b.jpg"],
+        "mediaItem": 1
+      }
+    ]
+  }
+]

@@ -1,0 +1,16 @@
+[
+  {
+    "id": 1,
+    "name": "Ogilvy Outdoor",
+    "email": "info@ogilvyoutdoor.com",
+    "address": "12 Herbert Macaulay Way, Yaba",
+    "location": "Lagos Mainland"
+  },
+  {
+    "id": 2,
+    "name": "Proactive Media",
+    "email": "contact@proactive.ng",
+    "address": "Plot 14 Wuse Zone 5",
+    "location": "Abuja"
+  }
+]

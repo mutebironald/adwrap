@@ -1,0 +1,30 @@
+[
+  {
+    "id": 1,
+    "type": "static",
+    "workspace": 1,
+    "format": "standard",
+    "location": "Iyana Oworo, Lagos",
+    "numberOfFaces": 2,
+    "closestLandmark": "Third Mainland Bridge",
+    "availability": "Available",
+    "staticMediaFaces": [
+      {
+        "id": 101,
+        "mediaItem": 1,
+        "description": "Facing traffic towards Island",
+        "availability": "Available",
+        "images": ["https://example.com/billboard-1a.jpg"],
+        "rent": 50000
+      },
+      {
+        "id": 102,
+        "mediaItem": 1,
+        "description": "Facing Mainland",
+        "availability": "Booked",
+        "images": ["https://example.com/billboard-1b.jpg"],
+        "rent": 45000
+      }
+    ]
+  }
+]
