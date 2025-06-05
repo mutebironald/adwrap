@@ -1,19 +1,24 @@
 'use client'
 
-// import { useState } from 'react'
-
-const tabs = [
-  { label: 'Static Media', value: 'static', count: 4 },
-  { label: 'Street poles', value: 'poles', count: 4 }
-]
+interface MediaTypeToggleProps {
+  selected: string
+  onSelect: (val: string) => void
+  counts: {
+    static: number
+    poles: number
+  }
+}
 
 export default function MediaTypeToggle({
   selected,
-  onSelect
-}: {
-  selected: string
-  onSelect: (val: string) => void
-}) {
+  onSelect,
+  counts
+}: MediaTypeToggleProps) {
+  const tabs = [
+    { label: 'Static Media', value: 'static', count: counts.static },
+    { label: 'Street Poles', value: 'poles', count: counts.poles }
+  ]
+
   return (
     <div className="flex space-x-6 border-b border-gray-200">
       {tabs.map((tab) => {

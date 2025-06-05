@@ -11,11 +11,15 @@ type MediaItem = {
 interface MediaState {
   items: MediaItem[];
   loading: boolean;
+  selectedTab: 'static' | 'pole';
+  expandedRow: string | null;
 }
 
 const initialState: MediaState = {
   items: [],
   loading: false,
+  expandedRow: null,
+  selectedTab: 'static'
 };
 
 const mediaSlice = createSlice({
@@ -31,8 +35,14 @@ const mediaSlice = createSlice({
     setLoading(state, action: PayloadAction<boolean>) {
       state.loading = action.payload;
     },
+        setSelectedTab: (state, action: PayloadAction<'static' | 'pole'>) => {
+      state.selectedTab = action.payload;
+    },
+        toggleExpandedRow: (state, action: PayloadAction<string>) => {
+      state.expandedRow = state.expandedRow === action.payload ? null : action.payload;
+    },
   },
 });
 
-export const { setMedia, addMedia, setLoading } = mediaSlice.actions;
+export const { setMedia, addMedia, setLoading, setSelectedTab, toggleExpandedRow } = mediaSlice.actions;
 export default mediaSlice.reducer;

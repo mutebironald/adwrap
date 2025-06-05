@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import React from "react";
+import React, { useState, useMemo, useEffect } from "react";
 
 import { Input } from "@/components/ui/input";
 import {
@@ -12,81 +11,83 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import MediaTypeToggle from "@/components/MediaTypeToggle";
+import MediaTypeToggle from "@/components/table/MediaTypeToggle";
 import { cn } from "@/lib/utils";
-
 import { Search } from "lucide-react";
-const mediaItems = [
-  {
-    id: "B-ID 001",
-    type: "static",
-    location: "Kyebando Central",
-    format: "Standard",
-    faces: "1 Face",
-    availability: "Occupied",
-    rent: "UGX 3,000,000",
-    staticMediaFaces: [
-      { id: "Face A", orientation: "North", dimension: "6x3m" },
-      { id: "Face B", orientation: "South", dimension: "6x3m" },
-    ],
-  },
-  {
-    id: "P-ID 002",
-    type: "pole",
-    location: "Bukoto Road",
-    format: "Pole",
-    faces: "2 Faces",
-    availability: "Vacant",
-    rent: "UGX 1,500,000",
-    routes: [
-      { name: "Route 1", distance: "1km" },
-      { name: "Route 2", distance: "500m" },
-    ],
-  },
-];
+import { useSelector, useDispatch } from "react-redux";
+import { RootState } from "@/store";
+import { setSelectedTab, toggleExpandedRow } from "@/store/mediaSlice";
+import { useGetMediaItemsQuery } from "@/store/mediaApi";
 
+interface StaticMediaFace {
+  rent: string;
+  images: string;
+  description: string;
+  closestLandmark: string;
+  id: string;
+  orientation: string;
+  dimension: string;
+}
 
-// const mediaItems = [
-//   {
-//     id: "B-ID 001",
-//     type: "static", // billboard
-//     location: "Kyebando Central",
-//     description: "Along Kisaasi road",
-//     format: "Standard",
-//     faces: "1 Face",
-//     availability: "Occupied",
-//     rent: "UGX 3,000,000",
-//     staticMediaFaces: [
-//       { id: "Face A", orientation: "North", dimension: "6x3m" },
-//       { id: "Face B", orientation: "South", dimension: "6x3m" },
-//     ],
-//   },
-//   {
-//     id: "P-ID 002",
-//     type: "pole", // street pole
-//     location: "Bukoto Road",
-//     description: "Near Bukoto flats",
-//     format: "Pole",
-//     faces: "2 Faces",
-//     availability: "Vacant",
-//     rent: "UGX 1,500,000",
-//     routes: [
-//       { name: "Route 1", distance: "1km" },
-//       { name: "Route 2", distance: "500m" },
-//     ],
-//   },
-// ];
+interface RouteInterface {
+  name: string;
+  distance: string;
+}
 
 export default function MediaTable({ onBack }: { onBack: () => void }) {
-  const [selectedTab, setSelectedTab] = useState("static");
+  const workspaceId = "9"; // This could be dynamic later
+  const { data, isLoading, isError, refetch } =
+    useGetMediaItemsQuery(workspaceId);
 
-  const [expandedRow, setExpandedRow] = useState<string | null>(null);
+  const selectedTab = useSelector(
+    (state: RootState) => state.media.selectedTab
+  );
+
+  const dispatch = useDispatch();
+
+  const expandedRow = useSelector(
+    (state: RootState) => state.media.expandedRow
+  );
+
+  const [searchTerm, setSearchTerm] = useState("");
+
+  useEffect(() => {
+    if (workspaceId) {
+      refetch();
+    }
+  }, [workspaceId]);
+
+  const staticCount = data?.staticMedia?.length || 0;
+  const polesCount = data?.streetpoles?.length || 0;
+
+  const mediaItems = useMemo(() => {
+    return selectedTab === "static"
+      ? data?.staticMedia || []
+      : data?.streetpoles || [];
+  }, [data, selectedTab]);
+
+  const filteredMediaItems = useMemo(() => {
+    const term = searchTerm.trim().toLowerCase();
+    if (!term) return mediaItems;
+
+    return mediaItems.filter((item: any) =>
+      Object.values(item).some(
+        (val) =>
+          typeof val === "string" && val.toLowerCase().includes(term)
+      )
+    );
+  }, [searchTerm, mediaItems]);
+
+  if (isLoading) return <div>Loading media items...</div>;
+  if (isError) return <div>Failed to load media items.</div>;
 
   return (
     <div className="min-h-screen w-full bg-[#F2F2F5] flex flex-col items-center overflow-hidden px-4 py-6">
       {/* Workspace Details */}
       <div className="bg-white rounded-[8px] p-4 w-full h-[173px] flex flex-col gap-4 mb-19">
-        <h2 className="text-xl font-semibold text-gray-900">Workspace Name</h2>
+        <h2 className="text-xl font-semibold text-gray-900">
+          {mediaItems[0]?.workspaceName || "Workspace"}
+        </h2>
         <p className="text-sm text-gray-600">
           Details about the workspace, ownership, location, or anything you want
           to show here.
@@ -103,10 +104,21 @@ export default function MediaTable({ onBack }: { onBack: () => void }) {
           <div className="flex flex-col gap-4">
             <div className="relative w-[300px]">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-              <Input placeholder="faces" className="pl-10" />
+              <Input
+                placeholder="faces"
+                className="pl-10"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
             </div>
-
-            <MediaTypeToggle selected={selectedTab} onSelect={setSelectedTab} />
+            <MediaTypeToggle
+              selected={selectedTab}
+              onSelect={(tab) => dispatch(setSelectedTab(tab))}
+              counts={{
+                static: staticCount,
+                poles: polesCount,
+              }}
+            />
           </div>
         </div>
 
@@ -139,13 +151,11 @@ export default function MediaTable({ onBack }: { onBack: () => void }) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {mediaItems.map((item) => (
+              {filteredMediaItems.map((item: any) => (
                 <React.Fragment key={item.id}>
                   <TableRow
                     className="cursor-pointer"
-                    onClick={() =>
-                      setExpandedRow(expandedRow === item.id ? null : item.id)
-                    }
+                    onClick={() => dispatch(toggleExpandedRow(item.id))}
                   >
                     <TableCell>
                       <input type="checkbox" />
@@ -156,18 +166,21 @@ export default function MediaTable({ onBack }: { onBack: () => void }) {
                     <TableCell>{item.location}</TableCell>
                     <TableCell>{item.description}</TableCell>
                     <TableCell>{item.format}</TableCell>
-                    <TableCell>{item.faces}</TableCell>
+                    <TableCell>{item.numberOfFaces}</TableCell>
                     <TableCell>
                       <span
                         className={cn(
                           "px-2 py-1 rounded-full text-sm font-medium",
                           item.availability === "Vacant" &&
                             "bg-red-100 text-red-700",
-                          item.availability.includes("Occupied") &&
-                            "bg-green-100 text-green-700"
+                          item.availability
+                            .toLowerCase()
+                            .includes("available")
+                            ? "bg-green-100 text-green-700"
+                            : "bg-red-100 text-red-700"
                         )}
                       >
-                        {item.availability}
+                        {item.availability.toLowerCase()}
                       </span>
                     </TableCell>
                     <TableCell>{item.rent}</TableCell>
@@ -183,12 +196,15 @@ export default function MediaTable({ onBack }: { onBack: () => void }) {
                               Faces:
                             </p>
                             <ul className="list-disc list-inside text-sm text-gray-600">
-                              {item.staticMediaFaces?.map((face, idx) => (
-                                <li key={idx}>
-                                  {face.id} - {face.orientation} -{" "}
-                                  {face.dimension}
-                                </li>
-                              ))}
+                              {item.staticMediaFaces?.map(
+                                (face: StaticMediaFace, idx: number) => (
+                                  <li key={idx}>
+                                    {face.id} - {face.description} -{" "}
+                                    {face.images} - {face.rent + "UGX"}{" "}
+                                    {face.dimension}
+                                  </li>
+                                )
+                              )}
                             </ul>
                           </div>
                         )}
@@ -199,11 +215,13 @@ export default function MediaTable({ onBack }: { onBack: () => void }) {
                               Routes:
                             </p>
                             <ul className="list-disc list-inside text-sm text-gray-600">
-                              {item.routes?.map((route, idx) => (
-                                <li key={idx}>
-                                  {route.name} - {route.distance}
-                                </li>
-                              ))}
+                              {item.routes?.map(
+                                (route: RouteInterface, idx: number) => (
+                                  <li key={idx}>
+                                    {route.name} - {route.distance}
+                                  </li>
+                                )
+                              )}
                             </ul>
                           </div>
                         )}
@@ -232,6 +250,7 @@ export default function MediaTable({ onBack }: { onBack: () => void }) {
           <span className="text-sm text-blue-600 cursor-pointer">View All</span>
         </div>
       </div>
+
       {/* Back & Proceed Buttons */}
       <div className="w-full max-w-[1440px] mt-auto py-6 flex flex-col md:flex-row items-center justify-center gap-2 bg-[#F2F2F5]">
         <button

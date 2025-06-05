@@ -1,5 +1,5 @@
 'use client';
-import MediaTable from "@/components/MediaTable";
+import MediaTable from "@/components/table/MediaTable";
 import { useRouter } from "next/navigation";
 
 export default function MediaTablePage() {
