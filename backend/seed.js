@@ -10,10 +10,8 @@ async function seed() {
     await db.query('BEGIN');
 
     // Wipe tables
-    await db.query('DELETE FROM routes');
-    await db.query('DELETE FROM static_media_faces');
-    await db.query('DELETE FROM media_items');
-    await db.query('DELETE FROM workspaces');
+    await db.query('TRUNCATE TABLE routes, static_media_faces, media_items, workspaces RESTART IDENTITY CASCADE');
+
 
     // Seed workspaces and track ID mapping
     const workspaceIdMap = new Map();
