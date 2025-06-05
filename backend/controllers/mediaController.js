@@ -1,4 +1,4 @@
-import { createMediaItemService, getMediaItemsService } from '../services/mediaService.js';
+import { createMediaItemService, getMediaItemsService, getWorkspaceDetailsService } from '../services/mediaService.js';
 
 export async function createMediaItem(req, res) {
   try {
@@ -21,3 +21,14 @@ export const getMediaItems = async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch media items' });
   }
 };
+
+export const getWorkspaceDetails = async (req, res) => {
+  try {
+    const workspaceId = req.query.workspace;
+    const workspaceDetails = await getWorkspaceDetailsService(workspaceId);
+    res.json(workspaceDetails);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({error: 'Failed to get workspace details'})
+  }
+}
