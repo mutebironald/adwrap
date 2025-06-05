@@ -123,10 +123,10 @@ Successful Response:
 
 Retrieve Workspace Details
 ```bash
-GET /api/media-items/workspaces?workspaceId=2
+GET /api/media-items/workspaces?workspaceId=<workspaceId>
 ```
 
 Retrieve Media Items for Workspace
 ```bash
-GET /api/media-items?workspace=2
+GET /api/media-items?workspace=<workspaceId>
 ```
