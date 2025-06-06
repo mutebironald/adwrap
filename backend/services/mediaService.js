@@ -33,7 +33,7 @@ export async function createMediaItemService(data) {
 
     const {
       rows: [mediaItem],
-    } = await db.query(query, [
+    } = await client.query(query, [
       workspaceId,
       type,
       format,
@@ -226,6 +226,25 @@ export async function getWorkspaceDetailsService(workspaceId) {
 
     return results.rows[0];
   } catch (err) {
+    throw err;
+  }
+}
+
+export async function saveWorkspaceDetailsService(data) {
+  console.log(data, "----data----")
+  const { name, email, address, location } = data;
+
+  const query = `
+    INSERT INTO workspaces (name, email, address, location)
+    VALUES ($1, $2, $3, $4)
+    RETURNING *;
+  `;
+
+  try {
+    const { rows } = await db.query(query, [name, email, address, location]);
+    return rows[0];
+  } catch (err) {
+    console.error("Error creating workspace:", err.message);
     throw err;
   }
 }

@@ -1,4 +1,4 @@
-import { createMediaItemService, getMediaItemsService, getWorkspaceDetailsService } from '../services/mediaService.js';
+import { createMediaItemService, getMediaItemsService, getWorkspaceDetailsService, saveWorkspaceDetailsService } from '../services/mediaService.js';
 
 export async function createMediaItem(req, res) {
   try {
@@ -30,5 +30,17 @@ export const getWorkspaceDetails = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({error: 'Failed to get workspace details'})
+  }
+}
+
+
+export const saveWorkspaceDetails = async(req, res) => {
+  try {
+    const data = req.body;
+    const response = await saveWorkspaceDetailsService(data);
+    res.status(201).json(response)
+  }catch(err){
+    console.error(err);
+    res.status(500).json({error: 'Failed to save workspace details'})
   }
 }
