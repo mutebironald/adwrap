@@ -1,4 +1,3 @@
-// store/slices/workspaceSlice.ts
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface WorkspaceState {

@@ -1,5 +1,3 @@
-// src/features/media/mediaSlice.ts
-
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 type MediaItem = {
