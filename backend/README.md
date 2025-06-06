@@ -121,6 +121,20 @@ Successful Response:
 }
 ```
 
+Save Workspace Details
+```bash
+POST /api/media-items/workspaces
+```
+
+```json
+{
+  "name": "Kampala Office",
+  "email": "kampala@company.com",
+  "address": "Plot 23, Nakasero",
+  "location": "Kampala"
+}
+```
+
 Retrieve Workspace Details
 ```bash
 GET /api/media-items/workspaces?workspaceId=<workspaceId>
