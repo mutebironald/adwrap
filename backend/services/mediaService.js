@@ -231,7 +231,6 @@ export async function getWorkspaceDetailsService(workspaceId) {
 }
 
 export async function saveWorkspaceDetailsService(data) {
-  console.log(data, "----data----")
   const { name, email, address, location } = data;
 
   const query = `
