@@ -17,7 +17,10 @@ import { Search } from "lucide-react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store";
 import { setSelectedTab, toggleExpandedRow } from "@/store/mediaSlice";
-import { useGetMediaItemsQuery } from "@/store/mediaApi";
+import {
+  useGetMediaItemsQuery,
+  useGetWorkspaceDetailsQuery,
+} from "@/store/mediaApi";
 
 interface StaticMediaFace {
   rent: string;
@@ -35,9 +38,16 @@ interface RouteInterface {
 }
 
 export default function MediaTable({ onBack }: { onBack: () => void }) {
-  const workspaceId = "9"; // This could be dynamic later
+  const workspaceId = localStorage.getItem("workspaceId"); // This could be dynamic later
   const { data, isLoading, isError, refetch } =
     useGetMediaItemsQuery(workspaceId);
+
+  const {
+    data: workspaceDetails,
+    isLoading: isWorkspaceLoading,
+    isError: isWorkspaceError,
+  } = useGetWorkspaceDetailsQuery(workspaceId);
+
 
   const selectedTab = useSelector(
     (state: RootState) => state.media.selectedTab
@@ -72,8 +82,7 @@ export default function MediaTable({ onBack }: { onBack: () => void }) {
 
     return mediaItems.filter((item: any) =>
       Object.values(item).some(
-        (val) =>
-          typeof val === "string" && val.toLowerCase().includes(term)
+        (val) => typeof val === "string" && val.toLowerCase().includes(term)
       )
     );
   }, [searchTerm, mediaItems]);
@@ -86,12 +95,21 @@ export default function MediaTable({ onBack }: { onBack: () => void }) {
       {/* Workspace Details */}
       <div className="bg-white rounded-[8px] p-4 w-full h-[173px] flex flex-col gap-4 mb-19">
         <h2 className="text-xl font-semibold text-gray-900">
-          {mediaItems[0]?.workspaceName || "Workspace"}
+          {workspaceDetails?.name || "Workspace"}
         </h2>
-        <p className="text-sm text-gray-600">
-          Details about the workspace, ownership, location, or anything you want
-          to show here.
-        </p>
+        {isWorkspaceLoading ? (
+          <p className="text-sm text-gray-600">Loading workspace details...</p>
+        ) : isWorkspaceError ? (
+          <p className="text-sm text-red-600">
+            Failed to load workspace details.
+          </p>
+        ) : (
+          <div className="text-sm text-gray-600 flex flex-col gap-1">
+            <span>{workspaceDetails?.email}</span>
+            <span>{workspaceDetails?.location}</span>
+            <span>{workspaceDetails?.address}</span>
+          </div>
+        )}
       </div>
 
       {/* White Card containing Media Items Title, Search, Toggle, Table */}
@@ -173,9 +191,7 @@ export default function MediaTable({ onBack }: { onBack: () => void }) {
                           "px-2 py-1 rounded-full text-sm font-medium",
                           item.availability === "Vacant" &&
                             "bg-red-100 text-red-700",
-                          item.availability
-                            .toLowerCase()
-                            .includes("available")
+                          item.availability.toLowerCase().includes("available")
                             ? "bg-green-100 text-green-700"
                             : "bg-red-100 text-red-700"
                         )}

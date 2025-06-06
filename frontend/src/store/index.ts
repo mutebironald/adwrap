@@ -1,13 +1,17 @@
-import { configureStore } from '@reduxjs/toolkit';
-import mediaReducer from '@/features/media/mediaSlice';
-import { mediaApi } from './mediaApi';
+import { configureStore } from "@reduxjs/toolkit";
+import mediaReducer from "@/features/media/mediaSlice";
+import { mediaApi } from "./mediaApi";
+import workspaceReducer from "./workspaceSlice";
+import mediaFormReducer from "./mediaFormSlice";
 
 export const store = configureStore({
   reducer: {
     media: mediaReducer,
     [mediaApi.reducerPath]: mediaApi.reducer,
+    workspace: workspaceReducer,
+    mediaForm: mediaFormReducer,
   },
-    middleware: (getDefaultMiddleware) =>
+  middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(mediaApi.middleware),
 });
 
